@@ -16,6 +16,14 @@ poetry run spark-submit \
 ```
 
 ### Submit to Dataproc
+#### Preparing dependencies
+```bash
+poetry export -f requirements.txt --output requirements.txt
+```
+#### Copy initialization script GCS
+```bash
+gsutil cp requirements.txt gs://andresousa-experimental-scripts
+```
 #### Create Dataproc cluster
 Create the cluster with [python dependencies](./scripts/initialize-cluster.sh) and submit the job
 
@@ -25,10 +33,7 @@ gcloud dataproc clusters create cluster-sample \
 --region=${REGION} \
 --initialization-actions=gs://andresousa-experimental-scripts/initialize-cluster.sh
 ```
-### Preparing dependencies
-```bash
-poetry export -f requirements.txt --output requirements.txt
-```
+
 
 #### Submit job
 ```bash
@@ -36,7 +41,7 @@ gcloud dataproc jobs submit pyspark \
   --cluster=cluster-sample \
   --region=us-central1 \
   --py-files dist/structured_streaming-*.whl jobs/sample_job.py \
-  -- <SERVER>:9092 test-topic gs://andresousa-experimental-streaming-test gs://andresousa-experimental-checkpoints '2 seconds'
+  -- <SERVER>:9092 com.google.sample.purchases.2 gs://andresousa-experimental-streaming-test gs://andresousa-experimental-checkpoints '2 seconds'
 ```
 
 ## Debugging
