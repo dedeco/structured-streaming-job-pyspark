@@ -13,6 +13,8 @@ class KafkaConsumer:
             .readStream \
             .format("kafka") \
             .option("kafka.bootstrap.servers", brokers) \
+            .option("startingOffsets", "earliest") \
+            .option("maxOffsetsPerTrigger", "100000") \
             .option("subscribe", topic) \
             .load()
 
