@@ -10,9 +10,9 @@ poetry build
 ```bash
 poetry run spark-submit \
   --master local \
-  --packages 'org.apache.spark:spark-streaming-kafka-0-10_2.12:3.3.0,org.apache.spark:spark-sql-kafka-0-10_2.12:3.3.0'\
+  --packages 'org.apache.spark:spark-streaming-kafka-0-10_2.12:3.1.3,org.apache.spark:spark-sql-kafka-0-10_2.12:3.1.3'\
   --py-files dist/structured_streaming-*.whl jobs/sample_job.py \
-  <SERVER>:9092 com.google.sample.purchases.1 ./tmp/output ./tmp/checkpoint '2 seconds'
+  <IP_KAFKA_BROKER>:9092 com.google.sample.purchases.2 ./tmp/output ./tmp/checkpoint '60 seconds'
 ```
 
 ### Submit to Dataproc
@@ -31,7 +31,9 @@ Create the cluster with [python dependencies](./scripts/initialize-cluster.sh) a
 export REGION=us-central1;
 gcloud dataproc clusters create cluster-sample \
 --region=${REGION} \
---initialization-actions=gs://andresousa-experimental-scripts/initialize-cluster.sh
+--initialization-actions=gs://andresousa-experimental-scripts/initialize-cluster.sh \
+--max-failures-per-hour=10 \
+--max-failures-total=20 
 ```
 
 
@@ -40,8 +42,10 @@ gcloud dataproc clusters create cluster-sample \
 gcloud dataproc jobs submit pyspark \
   --cluster=cluster-sample \
   --region=us-central1 \
-  --py-files dist/structured_streaming-*.whl jobs/sample_job.py \
-  -- <SERVER>:9092 com.google.sample.purchases.2 gs://andresousa-experimental-streaming-test gs://andresousa-experimental-checkpoints '2 seconds'
+  --properties=^#^spark.jars.packages='org.apache.spark:spark-streaming-kafka-0-10_2.12:3.1.3,org.apache.spark:spark-sql-kafka-0-10_2.12:3.1.3' \
+  --py-files dist/structured_streaming-*.whl \
+  jobs/sample_job.py \
+  -- <IP_KAFKA_BROKER>:9092 com.google.sample.purchases.2 gs://andresousa-experimental-streaming-test/output gs://andresousa-experimental-checkpoints/checkpoint '60 seconds'
 ```
 
 ## Debugging

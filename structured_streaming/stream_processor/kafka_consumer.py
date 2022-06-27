@@ -14,6 +14,7 @@ class KafkaConsumer:
             .format("kafka") \
             .option("kafka.bootstrap.servers", brokers) \
             .option("startingOffsets", "earliest") \
+            .option("failOnDataLoss", "false") \
             .option("maxOffsetsPerTrigger", "100000") \
             .option("subscribe", topic) \
             .load()

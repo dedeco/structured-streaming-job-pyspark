@@ -1,30 +1,63 @@
-from pyspark.sql.types import StringType, StructType, StructField
+from datetime import datetime
 
-from structured_streaming.data_transformation.tranformations import with_clean_user_name
+from pyspark.sql.types import StringType, StructType, StructField, TimestampType, DoubleType, IntegerType
+
+from structured_streaming.data_transformation.tranformations import with_year_month_day_and_hour
 from tests import spark_session
 
 
 class TestTransformation(object):
 
-    def test_with_clean_user_name(self):
+    def test_with_timestamp(self):
         schema = StructType([
-            StructField("user_name", StringType(), True),
-            StructField("letter", StringType(), True)
+            StructField("username", StringType(), True),
+            StructField("currency", StringType(), True),
+            StructField("amount", DoubleType(), True)
         ])
 
         source_df = spark_session.createDataFrame(
-            [("fons&&eca", "a"), ("<##>jose", "b"), ("!!samuel**", "c")],
+            [("jonesdarren", "LYD", 98.15),
+             ("hudsonjon", "AED", 1502.05)],
             schema=schema
         )
-        result_df = with_clean_user_name(source_df)
+
+        result_df = with_year_month_day_and_hour(source_df)
 
         expected_schema = StructType([
-            StructField("user_name", StringType(), True),
-            StructField("letter", StringType(), True),
-            StructField("clean_user_name", StringType(), True),
+            StructField("username", StringType(), True),
+            StructField("currency", StringType(), True),
+            StructField("amount", DoubleType(), True),
+            StructField("timestamp", TimestampType(), True),
+            StructField("year", IntegerType(), True),
+            StructField("month", IntegerType(), True),
+            StructField("day", IntegerType(), True),
+            StructField("hour", IntegerType(), True),
         ])
+
+        dt = datetime.now()
+
         expected_df = spark_session.createDataFrame(
-            [("fons&&eca", "a", "fonseca"), ("<##>jose", "b", "jose"), ("!!samuel**", "c", "samuel")],
+            [
+                (
+                    "jonesdarren", "LYD"
+                    , 98.15
+                    , dt
+                    , int(dt.strftime("%Y"))
+                    , int(dt.strftime("%m"))
+                    , int(dt.strftime("%d"))
+                    , int(dt.strftime("%H"))
+                ),
+                (
+                    "hudsonjon"
+                    , "AED"
+                    , 1502.05
+                    , dt
+                    , int(dt.strftime("%Y"))
+                    , int(dt.strftime("%m"))
+                    , int(dt.strftime("%d"))
+                    , int(dt.strftime("%H"))
+                )
+            ],
             schema=expected_schema
         )
 

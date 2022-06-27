@@ -1,9 +1,9 @@
 import pyspark.sql.functions as F
-import quinn
 
 
-def with_clean_user_name(df):
-    return df.withColumn(
-        "clean_username",
-        quinn.remove_non_word_characters(F.col("username"))
-    )
+def with_year_month_day_and_hour(df):
+    return df.withColumn("timestamp", F.current_timestamp()) \
+        .withColumn("year", F.year("timestamp")) \
+        .withColumn("month", F.month("timestamp")) \
+        .withColumn("day", F.dayofmonth("timestamp")) \
+        .withColumn("hour", F.hour("timestamp"))
