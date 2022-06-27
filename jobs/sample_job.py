@@ -3,7 +3,7 @@ import sys
 
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, from_json
-from pyspark.sql.types import StructType, StructField, StringType, IntegerType
+from pyspark.sql.types import StructType, StructField, StringType, DoubleType
 
 from structured_streaming.data_transformation.tranformations import with_year_month_day_and_hour
 from structured_streaming.storage.write_storage import WriteStorage
@@ -29,7 +29,7 @@ if __name__ == "__main__":
     schema = StructType([
         StructField("username", StringType(), True),
         StructField("currency", StringType(), True),
-        StructField("amount", IntegerType(), True)
+        StructField("amount", DoubleType(), True)
     ])
 
     lines = stream_df.select(from_json(
