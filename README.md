@@ -31,9 +31,8 @@ Create the cluster with [python dependencies](./scripts/initialize-cluster.sh) a
 export REGION=us-central1;
 gcloud dataproc clusters create cluster-sample \
 --region=${REGION} \
---initialization-actions=gs://andresousa-experimental-scripts/initialize-cluster.sh \
---max-failures-per-hour=10 \
---max-failures-total=20 
+--image-version 2.0-debian10 \
+--initialization-actions=gs://andresousa-experimental-scripts/initialize-cluster.sh 
 ```
 
 
