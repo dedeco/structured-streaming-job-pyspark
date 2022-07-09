@@ -1,4 +1,4 @@
-# Structured Streaming
+# Some Sample Structured Streaming
 
 ## Run the job (local)
 ### Build
